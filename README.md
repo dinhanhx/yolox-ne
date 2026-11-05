@@ -5,7 +5,7 @@
 YOLOX is an anchor-free version of YOLO, with a simpler design but better performance! It aims to bridge the gap between research and industrial communities.
 For more details, please refer to our [report on Arxiv](https://arxiv.org/abs/2107.08430).
 
-This repo is an implementation of PyTorch version YOLOX, there is also a [MegEngine implementation](https://github.com/MegEngine/YOLOX).
+This repo is an implementation of PyTorch version YOLOX,
 
 <img src="assets/git_fig.png" width="1000" >
 
@@ -15,7 +15,6 @@ This repo is an implementation of PyTorch version YOLOX, there is also a [MegEng
 * 【2021/08/19】 We optimize the training process with **2x** faster training and **~1%** higher performance! See [notes](docs/updates_note.md) for more details.
 * 【2021/08/05】 We release [MegEngine version YOLOX](https://github.com/MegEngine/YOLOX).
 * 【2021/07/28】 We fix the fatal error of [memory leak](https://github.com/Megvii-BaseDetection/YOLOX/issues/103)
-* 【2021/07/26】 We now support [MegEngine](https://github.com/Megvii-BaseDetection/YOLOX/tree/main/demo/MegEngine) deployment.
 * 【2021/07/20】 We have released our technical report on [Arxiv](https://arxiv.org/abs/2107.08430).
 
 ## Benchmark
@@ -209,12 +208,8 @@ python -m yolox.tools.eval -n  yolox-s -c yolox_s.pth -b 1 -d 1 --conf 0.001 --f
 ## Deployment
 
 
-1. [MegEngine in C++ and Python](./demo/MegEngine)
-2. [ONNX export and an ONNXRuntime](./demo/ONNXRuntime)
-3. [TensorRT in C++ and Python](./demo/TensorRT)
-4. [ncnn in C++ and Java](./demo/ncnn)
-5. [OpenVINO in C++ and Python](./demo/OpenVINO)
-6. [Accelerate YOLOX inference with nebullvm in Python](./demo/nebullvm)
+1. [ONNX export and an ONNXRuntime](./demo/ONNXRuntime)
+2. [TensorRT in C++ and Python](./demo/TensorRT)
 
 ## Third-party resources
 * YOLOX for streaming perception: [StreamYOLO (CVPR 2022 Oral)](https://github.com/yancie-yjr/StreamYOLO)
