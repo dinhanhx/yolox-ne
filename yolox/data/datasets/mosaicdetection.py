@@ -118,7 +118,7 @@ class MosaicDetection(Dataset):
                     labels[:, 3] = scale * _labels[:, 3] + padh
                 mosaic_labels.append(labels)
 
-            if len(mosaic_labels):
+            if mosaic_labels:
                 mosaic_labels = np.concatenate(mosaic_labels, 0)
                 np.clip(mosaic_labels[:, 0], 0, 2 * input_w, out=mosaic_labels[:, 0])
                 np.clip(mosaic_labels[:, 1], 0, 2 * input_h, out=mosaic_labels[:, 1])

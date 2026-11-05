@@ -32,7 +32,7 @@ dependencies = [
 
 [project.optional-dependencies]
 export = ["onnx>=1.13", "onnxsim", "onnxruntime"]
-trt = ["tensorrt>=10"]  # JetPack provides TRT on Jetson, so don't hard-require it
+trt = ["tensorrt>=10,<11"]  # <11: TRT 11 removed BuilderFlag.FP16; JetPack provides TRT on Jetson
 test = ["pytest", "tomli; python_version<'3.11'"]
 
 [project.urls]
@@ -45,3 +45,27 @@ include-package-data = true  # cpp sources via MANIFEST.in
 
 [tool.setuptools.dynamic]
 version = { attr = "yolox.__version__" }
+
+[tool.ruff]
+line-length = 120
+extend-exclude = ["docs/conf.py"]
+
+[tool.ruff.lint]
+# Flake8 - E, F; pycodestyle - W; flake8-builtins - A; Pylint - PLC, PLE, PLW; isort - I
+select = ["E", "F", "W", "A", "PLC", "PLE", "PLW", "I"]
+# Legacy code style kept as is: lazy imports are intentional (tensorrt, wandb, ...),
+# and `id` / `input` / loop-variable reuse are everywhere.
+ignore = ["PLC0415", "PLW2901", "A001", "A002"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "F403"]  # re-exports
+
+[tool.ruff.lint.isort]
+known-first-party = ["yolox"]
+
+[tool.ruff.format]
+# Like Black
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"

@@ -3,6 +3,7 @@
 # Copyright (c) Megvii, Inc. and its affiliates.
 
 import argparse
+
 from loguru import logger
 
 from yolox.utils.trt import build_engine

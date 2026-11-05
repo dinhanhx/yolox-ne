@@ -4,9 +4,9 @@
 import datetime
 import os
 import time
-from loguru import logger
 
 import torch
+from loguru import logger
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.tensorboard import SummaryWriter
 
@@ -31,8 +31,8 @@ from yolox.utils import (
     occupy_mem,
     save_checkpoint,
     setup_logger,
+    synchronize,
     torch_load,
-    synchronize
 )
 
 

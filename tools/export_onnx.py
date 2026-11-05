@@ -5,9 +5,9 @@
 import argparse
 import inspect
 import os
-from loguru import logger
 
 import torch
+from loguru import logger
 from torch import nn
 
 from yolox.exp import get_exp

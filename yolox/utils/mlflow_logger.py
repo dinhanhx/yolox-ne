@@ -18,10 +18,10 @@ import importlib.util
 import json
 import os
 from collections.abc import MutableMapping
-import packaging.version
-from loguru import logger
 
+import packaging.version
 import torch
+from loguru import logger
 
 from yolox.utils import is_main_process
 
@@ -157,7 +157,7 @@ class MlflowLogger:
         self._mlflow_log_artifacts = os.getenv("YOLOX_MLFLOW_LOG_MODEL_ARTIFACTS",
                                                "False").upper() in self.ENV_VARS_TRUE_VALUES
         self._mlflow_log_model_per_n_epochs = int(os.getenv(
-            "YOLOX_MLFLOW_LOG_MODEL_PER_n_EPOCHS", 30))
+            "YOLOX_MLFLOW_LOG_MODEL_PER_n_EPOCHS", "30"))
 
         self._mlflow_log_nth_epoch_models = os.getenv("YOLOX_MLFLOW_LOG_Nth_EPOCH_MODELS",
                                                       "False").upper() in self.ENV_VARS_TRUE_VALUES

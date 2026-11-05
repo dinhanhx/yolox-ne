@@ -5,10 +5,10 @@
 import argparse
 import random
 import warnings
-from loguru import logger
 
 import torch
 import torch.backends.cudnn as cudnn
+from loguru import logger
 
 from yolox.core import launch
 from yolox.exp import Exp, check_exp_value, get_exp

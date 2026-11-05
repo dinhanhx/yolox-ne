@@ -5,9 +5,9 @@ import ast
 import pprint
 from abc import ABCMeta, abstractmethod
 from typing import Dict, List, Tuple
-from tabulate import tabulate
 
 import torch
+from tabulate import tabulate
 from torch.nn import Module
 
 from yolox.utils import LRScheduler
@@ -82,7 +82,7 @@ class BaseExp(metaclass=ABCMeta):
                         src_item_type = type(src_value[0])
                         v = [src_item_type(t) for t in v]
 
-                if src_value is not None and src_type != type(v):
+                if src_value is not None and src_type is not type(v):
                     try:
                         v = src_type(v)
                     except Exception:

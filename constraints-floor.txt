@@ -1,0 +1,5 @@
+# Lower bounds exercised by the "floor" CI job (torch/torchvision are installed first from the CPU index)
+torch==2.0.1
+torchvision==0.15.2
+numpy<2
+onnx<1.17

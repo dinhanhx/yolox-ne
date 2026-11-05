@@ -14,11 +14,10 @@ import os
 import pickle
 import time
 from contextlib import contextmanager
-from loguru import logger
 
 import numpy as np
-
 import torch
+from loguru import logger
 from torch import distributed as dist
 
 __all__ = [

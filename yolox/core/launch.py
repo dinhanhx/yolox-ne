@@ -6,11 +6,11 @@
 # Copyright (c) Megvii, Inc. and its affiliates.
 
 from datetime import timedelta
-from loguru import logger
 
 import torch
 import torch.distributed as dist
 import torch.multiprocessing as mp
+from loguru import logger
 
 import yolox.utils.dist as comm
 

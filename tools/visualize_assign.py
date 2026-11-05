@@ -2,19 +2,19 @@
 # Copyright (c) Megvii, Inc. and its affiliates.
 
 import os
-import sys
 import random
+import sys
 import time
 import warnings
-from loguru import logger
 
 import torch
 import torch.backends.cudnn as cudnn
+from loguru import logger
 
-from yolox.exp import Exp, get_exp
 from yolox.core import Trainer
-from yolox.utils import configure_module, configure_omp
+from yolox.exp import Exp, get_exp
 from yolox.tools.train import make_parser
+from yolox.utils import configure_module, configure_omp
 
 
 class AssignVisualizer(Trainer):

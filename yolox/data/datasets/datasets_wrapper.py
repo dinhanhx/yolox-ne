@@ -10,14 +10,13 @@ import weakref
 from abc import ABCMeta, abstractmethod
 from functools import partial, wraps
 from multiprocessing.pool import ThreadPool
-import psutil
-from loguru import logger
-from tqdm import tqdm
 
 import numpy as np
-
+import psutil
+from loguru import logger
 from torch.utils.data.dataset import ConcatDataset as torchConcatDataset
 from torch.utils.data.dataset import Dataset as torchDataset
+from tqdm import tqdm
 
 
 class ConcatDataset(torchConcatDataset):

@@ -6,10 +6,10 @@ import argparse
 import os
 import random
 import warnings
-from loguru import logger
 
 import torch
 import torch.backends.cudnn as cudnn
+from loguru import logger
 from torch.nn.parallel import DistributedDataParallel as DDP
 
 from yolox.core import launch

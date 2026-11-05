@@ -1,7 +1,6 @@
 import numpy as np
 import pytest
 import torch
-
 from torch.utils.data import SequentialSampler
 
 from yolox.data import DataLoader, YoloBatchSampler

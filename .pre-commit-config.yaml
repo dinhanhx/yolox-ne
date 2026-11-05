@@ -1,8 +1,8 @@
 repos:
-  - repo: https://github.com/pycqa/flake8
-    rev: 3.8.3
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.3
     hooks:
-      - id: flake8
+      - id: ruff
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.1.0
     hooks:
@@ -20,11 +20,6 @@ repos:
     rev: v0.15.1
     hooks:
       - id: gitlint
-  - repo: https://github.com/pycqa/isort
-    rev: 4.3.21
-    hooks:
-      - id: isort
-
   - repo: https://github.com/PyCQA/autoflake
     rev: v1.4
     hooks:

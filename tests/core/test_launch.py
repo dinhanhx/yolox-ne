@@ -1,6 +1,5 @@
-from argparse import Namespace
-
 import importlib
+from argparse import Namespace
 
 # `yolox.core.launch` the module is shadowed by the `launch` function in yolox.core
 launch_mod = importlib.import_module("yolox.core.launch")

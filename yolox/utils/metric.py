@@ -5,10 +5,9 @@ import functools
 import os
 import time
 from collections import defaultdict, deque
-import psutil
 
 import numpy as np
-
+import psutil
 import torch
 
 __all__ = [
