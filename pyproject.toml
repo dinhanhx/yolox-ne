@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yolox-ne"  # import name stays `yolox`
+dynamic = ["version"]
+description = "YOLOX: Exceeding YOLO series in 2021 (Linux, PyTorch>=2, ONNX/TensorRT)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{ name = "megvii basedet team" }]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Operating System :: POSIX :: Linux",
+]
+dependencies = [
+  "numpy",
+  "torch>=2.0",
+  "torchvision",
+  "opencv-python",
+  "loguru",
+  "tqdm",
+  "thop",
+  "ninja",
+  "tabulate",
+  "psutil",
+  "tensorboard",
+  "pycocotools>=2.0.2",
+]
+
+[project.optional-dependencies]
+export = ["onnx>=1.13", "onnxsim", "onnxruntime"]
+trt = ["tensorrt>=10"]  # JetPack provides TRT on Jetson, so don't hard-require it
+test = ["pytest", "tomli; python_version<'3.11'"]
+
+[project.urls]
+Documentation = "https://yolox.readthedocs.io"
+Source = "https://github.com/Megvii-BaseDetection/YOLOX"
+Tracker = "https://github.com/Megvii-BaseDetection/YOLOX/issues"
+
+[tool.setuptools]
+include-package-data = true  # cpp sources via MANIFEST.in
+
+[tool.setuptools.dynamic]
+version = { attr = "yolox.__version__" }
