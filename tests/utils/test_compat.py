@@ -53,3 +53,19 @@ def test_grad_scaler_disabled_has_no_deprecation_warning():
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         assert not grad_scaler(False).is_enabled()
+
+
+@pytest.mark.skipif(not hasattr(torch.serialization, "get_safe_globals"), reason="needs torch>=2.5")
+def test_numpy_scalar_allowed_under_both_numpy_module_names():
+    # a checkpoint saved under numpy 1 names it numpy.core..., under numpy 2 numpy._core...
+    torch_load.__globals__["_allow_numpy_scalars"]()
+    allowed = {g[1] if isinstance(g, tuple) else f"{g.__module__}.{g.__qualname__}"
+               for g in torch.serialization.get_safe_globals()}
+    assert {"numpy.core.multiarray.scalar", "numpy._core.multiarray.scalar"} <= allowed
+
+
+def test_trust_env_var_loads_legacy_checkpoint(tmp_path, monkeypatch):
+    path = tmp_path / "legacy.pth"
+    torch.save({"x": _Arbitrary()}, path)
+    monkeypatch.setenv("YOLOX_TRUST_CKPT", "1")
+    assert "x" in torch_load(path)

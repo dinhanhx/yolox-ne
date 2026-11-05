@@ -1,5 +1,7 @@
 # YOLOX-TensorRT in C++
 
+> **Not ported yet:** this C++ demo is written for TensorRT 7 (`getBindingIndex`, `enqueue`, `destroy`, tensor names `input_0`/`output_0`) and does not build against TensorRT 10, which the Python tooling now requires. Use the Python demo until it is ported.
+
 Engines are built from ONNX by `tools/trt.py`; this C++ demo only loads a serialized engine and does not include model converting or constructing.
 
 
