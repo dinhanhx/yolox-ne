@@ -146,14 +146,12 @@ class COCOEvaluator:
         n_samples = max(len(self.dataloader) - 1, 1)
 
         if trt_file is not None:
-            from torch2trt import TRTModule
+            from yolox.utils.trt import TRTModule
 
-            model_trt = TRTModule()
-            model_trt.load_state_dict(torch.load(trt_file))
-
+            # one torch forward pass sets head.hw, which the decoder reads
             x = torch.ones(1, 3, test_size[0], test_size[1]).cuda()
             model(x)
-            model = model_trt
+            model = TRTModule(trt_file)
 
         for cur_iter, (imgs, _, info_imgs, ids) in enumerate(
             progress_bar(self.dataloader)

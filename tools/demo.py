@@ -120,14 +120,12 @@ class Predictor(object):
         self.fp16 = fp16
         self.preproc = ValTransform(legacy=legacy)
         if trt_file is not None:
-            from torch2trt import TRTModule
+            from yolox.utils.trt import TRTModule
 
-            model_trt = TRTModule()
-            model_trt.load_state_dict(torch.load(trt_file))
-
+            # one torch forward pass sets head.hw, which the decoder reads
             x = torch.ones(1, 3, exp.test_size[0], exp.test_size[1]).cuda()
             self.model(x)
-            self.model = model_trt
+            self.model = TRTModule(trt_file)
 
     def inference(self, img):
         img_info = {"id": 0}
@@ -291,10 +289,10 @@ def main(exp, args):
 
     if args.trt:
         assert not args.fuse, "TensorRT model is not support model fusing!"
-        trt_file = os.path.join(file_name, "model_trt.pth")
+        trt_file = os.path.join(file_name, "model_trt.engine")
         assert os.path.exists(
             trt_file
-        ), "TensorRT model is not found!\n Run python3 tools/trt.py first!"
+        ), "TensorRT model is not found!\n Run tools/export_onnx.py then tools/trt.py first!"
         model.head.decode_in_inference = False
         decoder = model.head.decode_outputs
         logger.info("Using TensorRT to inference")

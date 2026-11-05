@@ -1,14 +1,11 @@
 # YOLOX-TensorRT in C++
 
-As YOLOX models are easy to convert to tensorrt using [torch2trt gitrepo](https://github.com/NVIDIA-AI-IOT/torch2trt), 
-our C++ demo does not include the model converting or constructing like other tenorrt demos.
+Engines are built from ONNX by `tools/trt.py`; this C++ demo only loads a serialized engine and does not include model converting or constructing.
 
 
 ## Step 1: Prepare serialized engine file
 
-Follow the trt [python demo README](https://github.com/Megvii-BaseDetection/YOLOX/blob/main/demo/TensorRT/python/README.md) to convert and save the serialized engine file.
-
-Check the 'model_trt.engine' file generated from Step 1, which will be automatically saved at the current demo dir.
+Follow the trt [python demo README](https://github.com/Megvii-BaseDetection/YOLOX/blob/main/demo/TensorRT/python/README.md) to export ONNX and build the serialized engine file, then copy it to this demo dir as `model_trt.engine`.
 
 
 ## Step 2: build the demo

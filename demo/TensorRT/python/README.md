@@ -1,40 +1,27 @@
 # YOLOX-TensorRT in Python
 
-This tutorial includes a Python demo for TensorRT.
+Engines are built from ONNX with TensorRT 10.x (`tensorrt>=10,<11`). On Jetson use the TensorRT that ships with JetPack instead of pip.
 
-## Install TensorRT Toolkit
+## Install
 
-Please follow the [TensorRT Installation Guide](https://docs.nvidia.com/deeplearning/tensorrt/install-guide/index.html) and [torch2trt gitrepo](https://github.com/NVIDIA-AI-IOT/torch2trt) to install TensorRT and torch2trt.
+```shell
+pip install -e ".[export,trt]"
+```
 
 ## Convert model
 
-YOLOX models can be easily conveted to TensorRT models using torch2trt
+1. Export ONNX (raw head output, no decode; add `--dynamic` for a dynamic batch axis):
+   ```shell
+   python tools/export_onnx.py -n yolox-s -c your_ckpt.pth --output-name yolox_s.onnx
+   ```
+2. Build the engine (FP16 by default; `--no-fp16` for FP32, `-b` is the max batch of a `--dynamic` ONNX):
+   ```shell
+   python tools/trt.py --onnx yolox_s.onnx --engine YOLOX_outputs/yolox_s/model_trt.engine
+   ```
 
-   If you want to convert our model, use the flag -n to specify a model name:
-   ```shell
-   python tools/trt.py -n <YOLOX_MODEL_NAME> -c <YOLOX_CHECKPOINT>
-   ```
-   For example:
-   ```shell
-   python tools/trt.py -n yolox-s -c your_ckpt.pth
-   ```
-   <YOLOX_MODEL_NAME> can be: yolox-nano, yolox-tiny. yolox-s, yolox-m, yolox-l, yolox-x.
-
-   If you want to convert your customized model, use the flag -f to specify you exp file:
-   ```shell
-   python tools/trt.py -f <YOLOX_EXP_FILE> -c <YOLOX_CHECKPOINT>
-   ```
-   For example:
-   ```shell
-   python tools/trt.py -f /path/to/your/yolox/exps/yolox_s.py -c your_ckpt.pth
-   ```
-   *yolox_s.py* can be any exp file modified by you.
-
-The converted model and the serialized engine file (for C++ demo) will be saved on your experiment output dir.  
+`tools/demo.py` and `tools/eval.py` read `<output_dir>/<experiment-name>/model_trt.engine`. Engines are tied to the GPU and TensorRT version that built them.
 
 ## Demo
-
-The TensorRT python demo is merged on our pytorch demo file, so you can run the pytorch demo command with ```--trt```.
 
 ```shell
 python tools/demo.py image -n yolox-s --trt --save_result
@@ -43,4 +30,3 @@ or
 ```shell
 python tools/demo.py image -f exps/default/yolox_s.py --trt --save_result
 ```
-
