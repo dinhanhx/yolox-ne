@@ -1,5 +1,7 @@
 # Model Zoo
 
+Benchmarks and weights are published by the upstream project ([https://github.com/Megvii-BaseDetection/YOLOX](https://github.com/Megvii-BaseDetection/YOLOX)); they were not re-measured in this fork.
+
 ## Standard Models.
 
 |Model |size |mAP<sup>val<br>0.5:0.95 |mAP<sup>test<br>0.5:0.95 | Speed V100<br>(ms) | Params<br>(M) |FLOPs<br>(G)| weights |

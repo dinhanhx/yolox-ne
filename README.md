@@ -3,19 +3,45 @@
 
 ## Introduction
 YOLOX is an anchor-free version of YOLO, with a simpler design but better performance! It aims to bridge the gap between research and industrial communities.
-For more details, please refer to our [report on Arxiv](https://arxiv.org/abs/2107.08430).
+For more details, please refer to the [report on Arxiv](https://arxiv.org/abs/2107.08430) by the YOLOX authors.
 
-This repo is an implementation of PyTorch version YOLOX.
+This repo (`yolox-ne`, import name `yolox`) is a modernized fork of [Megvii-BaseDetection/YOLOX](https://github.com/Megvii-BaseDetection/YOLOX), the original implementation by the YOLOX authors. Model code, exps and benchmarks come from upstream; credit goes to them. Please cite the paper (see [Cite YOLOX](#cite-yolox)).
+
+**What this fork targets**
+
+| | |
+| --- | --- |
+| Python | ≥ 3.10 |
+| PyTorch | ≥ 2.0 (torchvision matching) |
+| OS | Linux only |
+| CUDA | ≥ 11 (GPU and TensorRT) |
+| Deployment | ONNX (ONNX Runtime) and TensorRT 10.x only |
+| Dataset / metric | COCO only |
+
+**Differences from upstream**
+* Packaging uses `pyproject.toml`; installing no longer needs torch at build time. The fast COCO eval op is JIT-compiled on first use.
+* Removed: Windows support, MegEngine / ncnn / OpenVINO / nebullvm demos, TorchScript export, VOC dataset and evaluator, `torch2trt`.
+* Multi-GPU training always uses `spawn`. `--cache ram` stores images in one shared file under `/dev/shm`.
+* Checkpoints are loaded with `weights_only=True` (see [Installation](#quick-start)).
+* ONNX export uses the public `torch.onnx.export` (default opset 17). TensorRT engines are built from ONNX with `tools/trt.py`.
+* Lint is `ruff`. The CI workflow defines a torch 2.0 floor job, a latest-torch job and a self-hosted GPU/TensorRT job; it has not been run on GitHub Actions yet.
+
+See [SPEC.md](./SPEC.md) for the detailed specification and what was verified. Benchmarks and pretrained weights below are upstream's and were not re-measured here.
 
 <img src="assets/git_fig.png" width="1000" >
 
 ## Updates!!
-* 【2023/02/28】 We support assignment visualization tool, see doc [here](./docs/assignment_visualization.md).
-* 【2022/04/14】 We support jit compile op.
-* 【2021/08/19】 We optimize the training process with **2x** faster training and **~1%** higher performance! See [notes](docs/updates_note.md) for more details.
-* 【2021/08/05】 We release [MegEngine version YOLOX](https://github.com/MegEngine/YOLOX).
-* 【2021/07/28】 We fix the fatal error of [memory leak](https://github.com/Megvii-BaseDetection/YOLOX/issues/103)
-* 【2021/07/20】 We have released our technical report on [Arxiv](https://arxiv.org/abs/2107.08430).
+
+**This fork**
+* 【2026/11/05】 Migration to Python ≥ 3.10, PyTorch ≥ 2.0, Linux, ONNX + TensorRT 10 deployment. See [SPEC.md](./SPEC.md).
+
+**Upstream** (history of the original YOLOX project, summarized from its README)
+* 【2023/02/28】 Upstream added an assignment visualization tool, see doc [here](./docs/assignment_visualization.md).
+* 【2022/04/14】 Upstream added JIT-compiled ops.
+* 【2021/08/19】 Upstream optimized the training process: **2x** faster training and **~1%** higher performance. See [notes](docs/updates_note.md) for more details.
+* 【2021/08/05】 Upstream released the [MegEngine version YOLOX](https://github.com/MegEngine/YOLOX).
+* 【2021/07/28】 Upstream fixed the fatal error of [memory leak](https://github.com/Megvii-BaseDetection/YOLOX/issues/103).
+* 【2021/07/20】 The YOLOX authors released their technical report on [Arxiv](https://arxiv.org/abs/2107.08430).
 
 ## Benchmark
 
@@ -65,12 +91,24 @@ This repo is an implementation of PyTorch version YOLOX.
 <details>
 <summary>Installation</summary>
 
-Step1. Install YOLOX from source.
+Requirements: Linux, Python ≥ 3.10, PyTorch ≥ 2.0 with a matching torchvision, CUDA ≥ 11 for GPU / TensorRT.
+
+Step1. Install PyTorch for your CUDA version, following [pytorch.org](https://pytorch.org/get-started/locally/).
+
+Step2. Install YOLOX from source (clone this repository; upstream is [here](https://github.com/Megvii-BaseDetection/YOLOX)).
 ```shell
-git clone git@github.com:Megvii-BaseDetection/YOLOX.git
 cd YOLOX
 pip3 install -v -e .
 ```
+Optional extras:
+```shell
+pip3 install -v -e ".[export]"   # onnx, onnxsim, onnxruntime
+pip3 install -v -e ".[trt]"      # tensorrt>=10,<11 (on Jetson use the TensorRT from JetPack instead)
+pip3 install -v -e ".[test]"     # pytest
+```
+Do not install this fork next to upstream's `yolox` package: both use the import name `yolox`.
+
+Checkpoints are loaded with `torch.load(..., weights_only=True)`. If an old checkpoint is refused (for example one containing numpy scalars on torch < 2.4), set `YOLOX_TRUST_CKPT=1` for that command, and only for files you trust.
 
 </details>
 
@@ -97,7 +135,7 @@ python tools/demo.py video -n yolox-s -c /path/to/your/yolox_s.pth --path /path/
 </details>
 
 <details>
-<summary>Reproduce our results on COCO</summary>
+<summary>Reproduce the upstream results on COCO</summary>
 
 Step1. Prepare COCO dataset
 ```shell
@@ -105,7 +143,7 @@ cd <YOLOX_HOME>
 ln -s /path/to/your/COCO ./datasets/COCO
 ```
 
-Step2. Reproduce our results on COCO by specifying -n:
+Step2. Reproduce the upstream results on COCO by specifying -n:
 
 ```shell
 python -m yolox.tools.train -n yolox-s -d 8 -b 64 --fp16 -o [--cache]
@@ -116,7 +154,7 @@ python -m yolox.tools.train -n yolox-s -d 8 -b 64 --fp16 -o [--cache]
 * -d: number of gpu devices
 * -b: total batch size, the recommended number for -b is num-gpu * 8
 * --fp16: mixed precision training
-* --cache: caching imgs into RAM to accelarate training, which need large system RAM.
+* --cache: caching imgs into RAM to accelarate training, which need large system RAM. The cache lives in `/dev/shm` (shared by all ranks and dataloader workers), so `/dev/shm` must be large enough; in Docker raise it with `--shm-size`.
 
 
 
@@ -130,7 +168,7 @@ python -m yolox.tools.train -f exps/default/yolox_s.py -d 8 -b 64 --fp16 -o [--c
 
 **Multi Machine Training**
 
-We also support multi-nodes training. Just add the following args:
+Multi-node training is supported. Just add the following args:
 * --num\_machines: num of your total training nodes
 * --machine\_rank: specify the rank of each node
 
@@ -171,7 +209,7 @@ python -m yolox.tools.train --help
 <details>
 <summary>Evaluation</summary>
 
-We support batch testing for fast evaluation:
+Batch testing is supported for fast evaluation:
 
 ```shell
 python -m yolox.tools.eval -n  yolox-s -c yolox_s.pth -b 64 -d 8 --conf 0.001 [--fp16] [--fuse]
@@ -183,7 +221,7 @@ python -m yolox.tools.eval -n  yolox-s -c yolox_s.pth -b 64 -d 8 --conf 0.001 [-
 * -d: number of GPUs used for evaluation. DEFAULT: All GPUs available will be used.
 * -b: total batch size across on all GPUs
 
-To reproduce speed test, we use the following command:
+The upstream speed test uses the following command:
 ```shell
 python -m yolox.tools.eval -n  yolox-s -c yolox_s.pth -b 1 -d 1 --conf 0.001 --fp16 --fuse
                                yolox-m
@@ -209,7 +247,13 @@ python -m yolox.tools.eval -n  yolox-s -c yolox_s.pth -b 1 -d 1 --conf 0.001 --f
 
 
 1. [ONNX export and an ONNXRuntime](./demo/ONNXRuntime)
-2. [TensorRT in C++ and Python](./demo/TensorRT)
+2. [TensorRT (Python)](./demo/TensorRT/python): build an engine from ONNX with `tools/trt.py`. The [C++ demo](./demo/TensorRT/cpp) is still written for TensorRT 7 and has not been ported.
+
+```shell
+python tools/export_onnx.py -n yolox-s -c yolox_s.pth --output-name yolox_s.onnx      # add --dynamic for dynamic batch
+python tools/trt.py --onnx yolox_s.onnx --engine YOLOX_outputs/yolox_s/model_trt.engine  # TensorRT 10.x, FP16 by default
+python tools/demo.py image -n yolox-s --trt --path assets/dog.jpg --save_result
+```
 
 ## Third-party resources
 * YOLOX for streaming perception: [StreamYOLO (CVPR 2022 Oral)](https://github.com/yancie-yjr/StreamYOLO)
@@ -223,7 +267,7 @@ python -m yolox.tools.eval -n  yolox-s -c yolox_s.pth -b 1 -d 1 --conf 0.001 --f
 * Converting darknet or yolov5 datasets to COCO format for YOLOX: [YOLO2COCO](https://github.com/RapidAI/YOLO2COCO) from [Daniel](https://github.com/znsoftm)
 
 ## Cite YOLOX
-If you use YOLOX in your research, please cite our work by using the following BibTeX entry:
+The model, paper and benchmarks belong to the original authors ([upstream repo](https://github.com/Megvii-BaseDetection/YOLOX)). If you use YOLOX in your research, please cite their work by using the following BibTeX entry:
 
 ```latex
  @article{yolox2021,
@@ -234,11 +278,14 @@ If you use YOLOX in your research, please cite our work by using the following B
 }
 ```
 ## In memory of Dr. Jian Sun
-Without the guidance of [Dr. Jian Sun](https://scholar.google.com/citations?user=ALVSZAYAAAAJ), YOLOX would not have been released and open sourced to the community.
-The passing away of Dr. Sun is a huge loss to the Computer Vision field. We add this section here to express our remembrance and condolences to our captain Dr. Sun.
-It is hoped that every AI practitioner in the world will stick to the belief of "continuous innovation to expand cognitive boundaries, and extraordinary technology to achieve product value" and move forward all the way.
+This section is carried over from the upstream README. It is the original YOLOX authors' dedication, not a statement of this fork:
+
+> Without the guidance of [Dr. Jian Sun](https://scholar.google.com/citations?user=ALVSZAYAAAAJ), YOLOX would not have been released and open sourced to the community.
+> The passing away of Dr. Sun is a huge loss to the Computer Vision field. We add this section here to express our remembrance and condolences to our captain Dr. Sun.
+> It is hoped that every AI practitioner in the world will stick to the belief of "continuous innovation to expand cognitive boundaries, and extraordinary technology to achieve product value" and move forward all the way.
+>
+> 没有孙剑博士的指导，YOLOX也不会问世并开源给社区使用。
+> 孙剑博士的离去是CV领域的一大损失，我们在此特别添加了这个部分来表达对我们的“船长”孙老师的纪念和哀思。
+> 希望世界上的每个AI从业者秉持着“持续创新拓展认知边界，非凡科技成就产品价值”的观念，一路向前。
 
 <div align="center"><img src="assets/sunjian.png" width="200"></div>
-没有孙剑博士的指导，YOLOX也不会问世并开源给社区使用。
-孙剑博士的离去是CV领域的一大损失，我们在此特别添加了这个部分来表达对我们的“船长”孙老师的纪念和哀思。
-希望世界上的每个AI从业者秉持着“持续创新拓展认知边界，非凡科技成就产品价值”的观念，一路向前。

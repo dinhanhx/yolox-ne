@@ -4,14 +4,14 @@ This doc introduces how to convert your pytorch model into onnx, and how to run 
 
 ### Step1: Install onnxruntime
 
-run the following command to install onnxruntime:
+run the following command from the repository root to install onnxruntime together with the export tools (onnx, onnxsim):
 ```shell
-pip install onnxruntime
+pip install -e ".[export]"
 ```
 
 ### Step2: Get ONNX models
 
-Users might download our pre-generated ONNX models or convert their own models to ONNX.
+Users might download the pre-generated ONNX models published by the upstream YOLOX project (not re-generated or re-tested in this fork) or convert their own models to ONNX.
 
 #### Download ONNX models.
 
@@ -41,8 +41,10 @@ Notes:
 * -n: specify a model name. The model name must be one of the [yolox-s,m,l,x and yolox-nano, yolox-tiny, yolov3]
 * -c: the model you have trained
 * -o: opset version, default 17.
+* --dynamic: make the batch axis dynamic.
+* --decode_in_inference: decode boxes inside the graph. By default the graph returns the raw head output, as TensorRT expects, and decoding / NMS run in Python.
 * --no-onnxsim: disable onnxsim
-* To customize an input shape for onnx model,  modify the following code in tools/export.py:
+* To customize an input shape for onnx model,  modify the following code in tools/export_onnx.py:
 
     ```python
     dummy_input = torch.randn(1, 3, exp.test_size[0], exp.test_size[1])

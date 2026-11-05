@@ -3,18 +3,19 @@
 
 ## 1.Installation
 
-Step1. Install YOLOX.
+Requirements: Linux, Python >= 3.10, PyTorch >= 2.0 (with matching torchvision), CUDA >= 11 for GPU / TensorRT.
+
+Step1. Install PyTorch for your CUDA version, following [pytorch.org](https://pytorch.org/get-started/locally/).
+
+Step2. Install YOLOX from a clone of this repository (upstream: [https://github.com/Megvii-BaseDetection/YOLOX](https://github.com/Megvii-BaseDetection/YOLOX)). `pycocotools` is installed as a dependency.
 ```shell
-git clone git@github.com:Megvii-BaseDetection/YOLOX.git
 cd YOLOX
 pip3 install -U pip
 pip3 install -v -e .
 ```
-Step2. Install [pycocotools](https://github.com/cocodataset/cocoapi).
+Optional extras: `".[export]"` (onnx, onnxsim, onnxruntime), `".[trt]"` (tensorrt>=10,<11; use JetPack's TensorRT on Jetson), `".[test]"` (pytest).
 
-```shell
-pip3 install cython; pip3 install 'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI'
-```
+Checkpoints are loaded with `weights_only=True`. If an old checkpoint is refused, set `YOLOX_TRUST_CKPT=1` for that command, only for files you trust.
 
 ## 2.Demo
 
@@ -35,7 +36,7 @@ python tools/demo.py video -n yolox-s -c /path/to/your/yolox_s.pth --path /path/
 ```
 
 
-## 3.Reproduce our results on COCO
+## 3.Reproduce the upstream results on COCO
 
 Step1. Prepare COCO dataset
 ```shell
@@ -43,7 +44,7 @@ cd <YOLOX_HOME>
 ln -s /path/to/your/COCO ./datasets/COCO
 ```
 
-Step2. Reproduce our results on COCO by specifying -n:
+Step2. Reproduce the upstream results on COCO by specifying -n:
 
 ```shell
 python tools/train.py -n yolox-s -d 8 -b 64 --fp16 -o [--cache]
@@ -54,7 +55,7 @@ python tools/train.py -n yolox-s -d 8 -b 64 --fp16 -o [--cache]
 * -d: number of gpu devices
 * -b: total batch size, the recommended number for -b is num-gpu * 8
 * --fp16: mixed precision training
-* --cache: caching imgs into RAM to accelarate training, which need large system RAM.
+* --cache: caching imgs into RAM to accelarate training, which need large system RAM. The cache is stored in `/dev/shm`, which must be large enough (in Docker use `--shm-size`).
 
 **Weights & Biases for Logging**
 
@@ -91,7 +92,7 @@ More information available [here](https://docs.wandb.ai/guides/integrations/othe
 
 **Multi Machine Training**
 
-We also support multi-nodes training. Just add the following args:
+Multi-node training is supported. Just add the following args:
 * --num\_machines: num of your total training nodes
 * --machine\_rank: specify the rank of each node
 
@@ -106,7 +107,7 @@ python tools/train.py -f exps/default/yolox-s.py -d 8 -b 64 --fp16 -o [--cache]
 
 ## 4.Evaluation
 
-We support batch testing for fast evaluation:
+Batch testing is supported for fast evaluation:
 
 ```shell
 python tools/eval.py -n  yolox-s -c yolox_s.pth -b 64 -d 8 --conf 0.001 [--fp16] [--fuse]
@@ -118,7 +119,7 @@ python tools/eval.py -n  yolox-s -c yolox_s.pth -b 64 -d 8 --conf 0.001 [--fp16]
 * -d: number of GPUs used for evaluation. DEFAULT: All GPUs available will be used.
 * -b: total batch size across on all GPUs
 
-To reproduce speed test, we use the following command:
+The upstream speed test uses the following command:
 ```shell
 python tools/eval.py -n  yolox-s -c yolox_s.pth -b 1 -d 1 --conf 0.001 --fp16 --fuse
                          yolox-m

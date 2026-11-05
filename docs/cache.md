@@ -1,6 +1,6 @@
 # Cache Custom Data
 
-The caching feature is specifically tailored for users with ample memory resources. However, we still offer the option to cache data to disk, but disk performance can vary and may not guarantee optimal user experience. Implementing custom dataset RAM caching is also more straightforward and user-friendly compared to disk caching. With a few simple modifications, users can expect to see a significant increase in training speed, with speeds nearly double that of non-cached datasets.
+The caching feature is specifically tailored for users with ample memory resources. Caching to disk is also available, but disk performance can vary and may not guarantee optimal user experience. Implementing custom dataset RAM caching is also more straightforward and user-friendly compared to disk caching. With a few simple modifications, users can expect to see a significant increase in training speed, with speeds nearly double that of non-cached datasets.
 
 This page explains how to cache your own custom data with YOLOX.
 
@@ -95,3 +95,10 @@ It's important to note that the `cache_type` can be `"ram"` or `"disk"`, dependi
 - `data_dir`: the root directory of the dataset, e.g. `/path/to/COCO`.
 - `cache_dir_name`: the name of the directory to cache to disk, for example `"custom_cache"`, then the files cached to disk will be saved under `/path/to/COCO/custom_cache`.
 - `path_filename`: a list of paths to the data relative to the `data_dir`, e.g. if you have data `/path/to/COCO/train/1.jpg`, `/path/to/COCO/train/2.jpg`, then `path_filename = ['train/1.jpg', ' train/2.jpg']`.
+
+## 4. Where the RAM cache lives
+With `cache_type="ram"`, `CacheDataset` appends the images to a single file under `/dev/shm` (`yolox.data.datasets.datasets_wrapper.SharedImageCache`). Only its path and the per-image offsets are pickled, so spawned training ranks and dataloader workers read the same pages instead of holding copies.
+
+- The process that built the cache deletes the file when it exits or the dataset is garbage collected. After a hard kill (SIGKILL, OOM killer) delete the leftover `/dev/shm/yolox_cache_*` files by hand.
+- `/dev/shm` must be able to hold the whole cache. Docker defaults to 64 MB; raise it with `--shm-size`. If it is too small, caching fails with an `OSError` partway through.
+- `read_img` returns a copy, so augmentations can modify the image in place.

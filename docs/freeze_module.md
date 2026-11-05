@@ -5,7 +5,7 @@ Exp controls everything in YOLOX, so let's start from creating an Exp object.
 
 ## 1. Create your own expermiment object
 
-We take an example of YOLOX-S model on COCO dataset to give a more clear guide.
+This guide uses the YOLOX-S model on the COCO dataset as an example.
 
 Import the config you want (or write your own Exp object inherit from `yolox.exp.BaseExp`).
 ```python

@@ -4,7 +4,7 @@ This tutorial explains how to visualize your label asssignment result when train
 
 ## 1. Visualization command
 
-We provide a visualization tool to help you visualize your label assignment result. You can find it in [`tools/visualize_assignment.py`](../tools/visualize_assign.py).
+A visualization tool is provided to help you visualize your label assignment result. You can find it in [`tools/visualize_assignment.py`](../tools/visualize_assign.py).
 
 Here is an example of command to visualize your label assignment result:
 
