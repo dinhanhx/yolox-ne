@@ -20,7 +20,7 @@ class TestModelUtils(unittest.TestCase):
         data = torch.ones(1, 10, 10, 10)
         # use bn since bn changes state during train/val
         model = nn.BatchNorm2d(10)
-        prev_state = model.state_dict()
+        prev_state = {k: v.clone() for k, v in model.state_dict().items()}  # state_dict aliases live tensors
 
         modes = [False, True]
         results = [True, False]
@@ -37,7 +37,7 @@ class TestModelUtils(unittest.TestCase):
             )
 
         # test recurrsive context case
-        prev_state = model.state_dict()
+        prev_state = {k: v.clone() for k, v in model.state_dict().items()}  # state_dict aliases live tensors
         with adjust_status(model, training=False):
             with adjust_status(model, training=False):
                 model(data)

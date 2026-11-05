@@ -62,8 +62,7 @@ def configure_module(ulimit_value=8192):
         rlimit = resource.getrlimit(resource.RLIMIT_NOFILE)
         resource.setrlimit(resource.RLIMIT_NOFILE, (ulimit_value, rlimit[1]))
     except Exception:
-        # Exception might be raised in Windows OS or rlimit reaches max limit number.
-        # However, set rlimit value might not be necessary.
+        # rlimit may already be at its max; raising it is optional.
         pass
 
     # cv2

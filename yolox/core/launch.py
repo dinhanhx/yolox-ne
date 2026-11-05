@@ -5,7 +5,6 @@
 # Copyright (c) Facebook, Inc. and its affiliates.
 # Copyright (c) Megvii, Inc. and its affiliates.
 
-import sys
 from datetime import timedelta
 from loguru import logger
 
@@ -68,17 +67,6 @@ def launch(
             port = _find_free_port()
             dist_url = f"tcp://127.0.0.1:{port}"
 
-        start_method = "spawn"
-        cache = vars(args[1]).get("cache", False)
-
-        # To use numpy memmap for caching image into RAM, we have to use fork method
-        if cache:
-            assert sys.platform != "win32", (
-                "As Windows platform doesn't support fork method, "
-                "do not add --cache in your training command."
-            )
-            start_method = "fork"
-
         mp.start_processes(
             _distributed_worker,
             nprocs=num_gpus_per_machine,
@@ -92,7 +80,7 @@ def launch(
                 args,
             ),
             daemon=False,
-            start_method=start_method,
+            start_method="spawn",
         )
     else:
         main_func(*args)

@@ -3,9 +3,10 @@
 # Copyright (c) Megvii, Inc. and its affiliates.
 
 import bisect
-import copy
 import os
 import random
+import tempfile
+import weakref
 from abc import ABCMeta, abstractmethod
 from functools import partial, wraps
 from multiprocessing.pool import ThreadPool
@@ -124,6 +125,56 @@ class Dataset(torchDataset):
         return wrapper
 
 
+def _unlink_if_owner(path, owner_pid):
+    if os.getpid() == owner_pid and os.path.exists(path):
+        os.unlink(path)
+
+
+class SharedImageCache:
+    """
+    Images of any shape appended to one file in ``/dev/shm``. Only the path and the
+    (offset, shape, dtype) table are pickled, so spawned ranks / dataloader workers map the same
+    pages instead of each holding a copy. The creating process deletes the file when it is
+    garbage collected or exits.
+
+    NOTE: /dev/shm must be large enough for the whole cache (docker defaults to 64MB, raise it
+    with ``--shm-size``); writing past its size raises OSError.
+    """
+
+    def __init__(self, num_imgs, directory="/dev/shm"):
+        fd, self.path = tempfile.mkstemp(prefix="yolox_cache_", dir=directory)
+        self._writer = os.fdopen(fd, "wb")
+        self._meta = [None] * num_imgs
+        self._size = 0
+        self._mm = None
+        weakref.finalize(self, _unlink_if_owner, self.path, os.getpid())
+
+    def put(self, index, img):
+        img = np.ascontiguousarray(img)
+        self._writer.write(img.data)
+        self._meta[index] = (self._size, img.shape, img.dtype.str)
+        self._size += img.nbytes
+
+    def finish(self):
+        self._writer.close()
+        self._writer = None
+
+    def get(self, index):
+        if self._mm is None:
+            self._mm = np.memmap(self.path, dtype=np.uint8, mode="r")
+        offset, shape, dtype = self._meta[index]
+        # copy: callers modify the image in place (augmentation)
+        return np.frombuffer(
+            self._mm, dtype=dtype, count=int(np.prod(shape)), offset=offset
+        ).reshape(shape).copy()
+
+    def __getstate__(self):
+        assert self._writer is None, "cache must be finished before it is pickled"
+        state = self.__dict__.copy()
+        state["_mm"] = None
+        return state
+
+
 class CacheDataset(Dataset, metaclass=ABCMeta):
     """ This class is a subclass of the base :class:`yolox.data.datasets.Dataset`,
     that enables cache images to ram or disk.
@@ -173,10 +224,6 @@ class CacheDataset(Dataset, metaclass=ABCMeta):
                 path_filename=path_filename,
             )
 
-    def __del__(self):
-        if self.cache and self.cache_type == "ram":
-            del self.imgs
-
     @abstractmethod
     def read_img(self, index):
         """
@@ -217,7 +264,7 @@ class CacheDataset(Dataset, metaclass=ABCMeta):
 
         if self.cache and self.imgs is None:
             if self.cache_type == 'ram':
-                self.imgs = [None] * num_imgs
+                self.imgs = SharedImageCache(num_imgs)
                 logger.info("You are using cached images in RAM to accelerate training!")
             else:   # 'disk'
                 if not os.path.exists(self.cache_dir):
@@ -248,7 +295,7 @@ class CacheDataset(Dataset, metaclass=ABCMeta):
             pbar = tqdm(enumerate(load_imgs), total=num_imgs)
             for i, x in pbar:   # x = self.read_img(self, i, use_cache=False)
                 if self.cache_type == 'ram':
-                    self.imgs[i] = x
+                    self.imgs.put(i, x)
                 else:   # 'disk'
                     cache_filename = f'{self.path_filename[i].split(".")[0]}.npy'
                     cache_path_filename = os.path.join(self.cache_dir, cache_filename)
@@ -258,6 +305,8 @@ class CacheDataset(Dataset, metaclass=ABCMeta):
                 pbar.desc = \
                     f'Caching images ({b / gb:.1f}/{mem_required / gb:.1f}GB {self.cache_type})'
             pbar.close()
+            if self.cache_type == 'ram':
+                self.imgs.finish()
 
     def cal_cache_occupy(self, num_imgs):
         cache_bytes = 0
@@ -285,8 +334,7 @@ def cache_read_img(use_cache=True):
             cache = self.cache and use_cache
             if cache:
                 if self.cache_type == "ram":
-                    img = self.imgs[index]
-                    img = copy.deepcopy(img)
+                    img = self.imgs.get(index)
                 elif self.cache_type == "disk":
                     img = np.load(
                         os.path.join(
