@@ -5,6 +5,8 @@ import torch
 from torch import nn
 from torch.hub import load_state_dict_from_url
 
+from yolox.utils.compat import torch_load
+
 __all__ = [
     "create_yolox_model",
     "yolox_nano",
@@ -70,7 +72,7 @@ def create_yolox_model(name: str, pretrained: bool = True, num_classes: int = 80
         exp: Exp = get_exp(exp_file=exp_path)
         yolox_model = exp.get_model()
         if ckpt_path:
-            ckpt = torch.load(ckpt_path, map_location="cpu")
+            ckpt = torch_load(ckpt_path, map_location="cpu")
             if "model" in ckpt:
                 ckpt = ckpt["model"]
             yolox_model.load_state_dict(ckpt)

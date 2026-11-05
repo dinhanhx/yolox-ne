@@ -24,12 +24,14 @@ from yolox.utils import (
     get_rank,
     get_world_size,
     gpu_mem_usage,
+    grad_scaler,
     is_parallel,
     load_ckpt,
     mem_usage,
     occupy_mem,
     save_checkpoint,
     setup_logger,
+    torch_load,
     synchronize
 )
 
@@ -44,7 +46,7 @@ class Trainer:
         # training related attr
         self.max_epoch = exp.max_epoch
         self.amp_training = args.fp16
-        self.scaler = torch.cuda.amp.GradScaler(enabled=args.fp16)
+        self.scaler = grad_scaler(enabled=args.fp16)
         self.is_distributed = get_world_size() > 1
         self.rank = get_rank()
         self.local_rank = get_local_rank()
@@ -103,7 +105,7 @@ class Trainer:
         inps, targets = self.exp.preprocess(inps, targets, self.input_size)
         data_end_time = time.time()
 
-        with torch.cuda.amp.autocast(enabled=self.amp_training):
+        with torch.autocast("cuda", enabled=self.amp_training):
             outputs = self.model(inps, targets)
 
         loss = outputs["total_loss"]
@@ -316,7 +318,7 @@ class Trainer:
             else:
                 ckpt_file = self.args.ckpt
 
-            ckpt = torch.load(ckpt_file, map_location=self.device)
+            ckpt = torch_load(ckpt_file, map_location=self.device)
             # resume the model/optimizer state dict
             model.load_state_dict(ckpt["model"])
             self.optimizer.load_state_dict(ckpt["optimizer"])
@@ -337,7 +339,7 @@ class Trainer:
             if self.args.ckpt is not None:
                 logger.info("loading checkpoint for fine tuning")
                 ckpt_file = self.args.ckpt
-                ckpt = torch.load(ckpt_file, map_location=self.device)["model"]
+                ckpt = torch_load(ckpt_file, map_location=self.device)["model"]
                 model = load_ckpt(model, ckpt)
             self.start_epoch = 0
 
@@ -404,8 +406,8 @@ class Trainer:
                 "start_epoch": self.epoch + 1,
                 "model": save_model.state_dict(),
                 "optimizer": self.optimizer.state_dict(),
-                "best_ap": self.best_ap,
-                "curr_ap": ap,
+                "best_ap": float(self.best_ap),
+                "curr_ap": float(ap),
             }
             save_checkpoint(
                 ckpt_state,
