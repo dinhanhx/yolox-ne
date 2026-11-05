@@ -3,6 +3,7 @@
 # Copyright (c) Megvii, Inc. and its affiliates.
 
 import argparse
+import inspect
 import os
 from loguru import logger
 
@@ -26,7 +27,7 @@ def make_parser():
         "--output", default="output", type=str, help="output node name of onnx model"
     )
     parser.add_argument(
-        "-o", "--opset", default=11, type=int, help="onnx opset version"
+        "-o", "--opset", default=17, type=int, help="onnx opset version"
     )
     parser.add_argument("--batch-size", type=int, default=1, help="batch size")
     parser.add_argument(
@@ -56,6 +57,23 @@ def make_parser():
     )
 
     return parser
+
+
+def export_onnx(model, dummy_input, path, input_name="images", output_name="output",
+                dynamic=False, opset=17):
+    # torch >= 2.9 defaults to the dynamo exporter, which this repo has not validated;
+    # the kwarg only exists from torch 2.5, older versions only have the TorchScript exporter.
+    kwargs = {"dynamo": False} if "dynamo" in inspect.signature(torch.onnx.export).parameters else {}
+    torch.onnx.export(
+        model,
+        dummy_input,
+        path,
+        input_names=[input_name],
+        output_names=[output_name],
+        dynamic_axes={input_name: {0: "batch"}, output_name: {0: "batch"}} if dynamic else None,
+        opset_version=opset,
+        **kwargs,
+    )
 
 
 @logger.catch
@@ -88,15 +106,10 @@ def main():
     logger.info("loading checkpoint done.")
     dummy_input = torch.randn(args.batch_size, 3, exp.test_size[0], exp.test_size[1])
 
-    torch.onnx._export(
-        model,
-        dummy_input,
-        args.output_name,
-        input_names=[args.input],
-        output_names=[args.output],
-        dynamic_axes={args.input: {0: 'batch'},
-                      args.output: {0: 'batch'}} if args.dynamic else None,
-        opset_version=args.opset,
+    export_onnx(
+        model, dummy_input, args.output_name,
+        input_name=args.input, output_name=args.output,
+        dynamic=args.dynamic, opset=args.opset,
     )
     logger.info("generated onnx model named {}".format(args.output_name))
 
