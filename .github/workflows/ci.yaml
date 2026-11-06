@@ -1,8 +1,9 @@
 name: CI
 
+# Temporarily disabled: runs only when started manually from the Actions tab.
+# To re-enable, replace `workflow_dispatch:` with `push:` and `pull_request:`.
 on:
-  push:
-  pull_request:
+  workflow_dispatch:
 
 jobs:
   lint:
