@@ -10,6 +10,8 @@ Clone this repo and follow the [README](https://github.com/Megvii-BaseDetection/
 ## 1. Create your own dataset
 **Step 1** Prepare your own dataset with images and labels first. For labeling images, you can use tools like [Labelme](https://github.com/wkentaro/labelme) or [CVAT](https://github.com/openvinotoolkit/cvat).
 
+If your labels are in YOLO format (`images/<split>`, `labels/<split>/*.txt`), convert them to COCO first with `python tools/yolo2coco.py --src /path/to/yolo_dataset --out datasets/my_dataset` (see `exps/example/coco8/yolox_s.py` for a runnable example).
+
 **Step 2** Then, you should write the corresponding Dataset Class which can load images and labels through `__getitem__` method. Only COCO format is currently supported.
 
 You can also write the Dataset by your own. Let's take the [COCODataset](https://github.com/Megvii-BaseDetection/YOLOX/blob/main/yolox/data/datasets/coco.py) file for example:
