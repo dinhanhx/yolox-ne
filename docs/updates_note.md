@@ -11,7 +11,7 @@ Migration of `yolox-ne` from the original [YOLOX](https://github.com/Megvii-Base
 * Multi-GPU training always spawns processes; the RAM cache is a shared file in `/dev/shm`.
 * Checkpoints load with `weights_only=True` (`YOLOX_TRUST_CKPT=1` opts out for trusted files).
 
-Details and verification status: [SPEC.md](../SPEC.md).
+Details and verification status: [SPEC.md](https://github.com/dinhanhx/yolox-ne/blob/main/SPEC.md).
 
 ## 【2021/08/19】
 
