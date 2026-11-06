@@ -407,7 +407,7 @@ class Trainer:
                 "model": save_model.state_dict(),
                 "optimizer": self.optimizer.state_dict(),
                 "best_ap": float(self.best_ap),
-                "curr_ap": float(ap),
+                "curr_ap": None if ap is None else float(ap),
             }
             save_checkpoint(
                 ckpt_state,
