@@ -67,9 +67,9 @@ Please see `get_dataset`, `get_eval_dataset` and `get_evaluator` in [yolox_base.
 ✧✧✧ You can also see the `exps/example/custom` directory for more details.
 
 ## 3. Train
-Except special cases, using the upstream [COCO pretrained weights](https://github.com/Megvii-BaseDetection/YOLOX/blob/main/README.md) for initializing the model.
+Except special cases, using the original YOLOX [COCO pretrained weights](https://github.com/Megvii-BaseDetection/YOLOX/blob/main/README.md) for initializing the model.
 
-Once you get the Exp file and the COCO pretrained weights published by upstream, you can train your own model by the following below command:
+Once you get the Exp file and the COCO pretrained weights published by the original YOLOX project, you can train your own model by the following below command:
 ```bash
 python tools/train.py -f /path/to/your/Exp/file -d 8 -b 64 --fp16 -o -c /path/to/the/pretrained/weights [--cache]
 ```

@@ -5,9 +5,9 @@
 YOLOX is an anchor-free version of YOLO, with a simpler design but better performance! It aims to bridge the gap between research and industrial communities.
 For more details, please refer to the [report on Arxiv](https://arxiv.org/abs/2107.08430) by the YOLOX authors.
 
-This repo (`yolox-ne`, import name `yolox`) is a modernized fork of [Megvii-BaseDetection/YOLOX](https://github.com/Megvii-BaseDetection/YOLOX), the original implementation by the YOLOX authors. Model code, exps and benchmarks come from upstream; credit goes to them. Please cite the paper (see [Cite YOLOX](#cite-yolox)).
+This repo (`yolox-ne`, import name `yolox`) is an independent project derived from [Megvii-BaseDetection/YOLOX](https://github.com/Megvii-BaseDetection/YOLOX), the original implementation by the YOLOX authors. It is maintained separately from the original project. Model code, exps and benchmarks originate from the original project; credit goes to its authors. Please cite the paper (see [Cite YOLOX](#cite-yolox)).
 
-**What this fork targets**
+**What this project targets**
 
 | | |
 | --- | --- |
@@ -18,7 +18,7 @@ This repo (`yolox-ne`, import name `yolox`) is a modernized fork of [Megvii-Base
 | Deployment | ONNX (ONNX Runtime) and TensorRT 10.x only |
 | Dataset / metric | COCO only |
 
-**Differences from upstream**
+**Differences from the original YOLOX**
 * Packaging uses `pyproject.toml`; installing no longer needs torch at build time. The fast COCO eval op is JIT-compiled on first use.
 * Removed: Windows support, MegEngine / ncnn / OpenVINO / nebullvm demos, TorchScript export, VOC dataset and evaluator, `torch2trt`.
 * Multi-GPU training always uses `spawn`. `--cache ram` stores images in one shared file under `/dev/shm`.
@@ -26,21 +26,21 @@ This repo (`yolox-ne`, import name `yolox`) is a modernized fork of [Megvii-Base
 * ONNX export uses the public `torch.onnx.export` (default opset 17). TensorRT engines are built from ONNX with `tools/trt.py`.
 * Lint is `ruff`. The CI workflow defines a torch 2.0 floor job, a latest-torch job and a self-hosted GPU/TensorRT job; it has not been run on GitHub Actions yet.
 
-See [SPEC.md](./SPEC.md) for the detailed specification and what was verified. Benchmarks and pretrained weights below are upstream's and were not re-measured here.
+See [SPEC.md](./SPEC.md) for the detailed specification and what was verified. Benchmarks and pretrained weights below come from the original YOLOX project and were not re-measured here.
 
 <img src="assets/git_fig.png" width="1000" >
 
 ## Updates!!
 
-**This fork**
+**yolox-ne**
 * 【2026/11/05】 Migration to Python ≥ 3.10, PyTorch ≥ 2.0, Linux, ONNX + TensorRT 10 deployment. See [SPEC.md](./SPEC.md).
 
-**Upstream** (history of the original YOLOX project, summarized from its README)
-* 【2023/02/28】 Upstream added an assignment visualization tool, see doc [here](./docs/assignment_visualization.md).
-* 【2022/04/14】 Upstream added JIT-compiled ops.
-* 【2021/08/19】 Upstream optimized the training process: **2x** faster training and **~1%** higher performance. See [notes](docs/updates_note.md) for more details.
-* 【2021/08/05】 Upstream released the [MegEngine version YOLOX](https://github.com/MegEngine/YOLOX).
-* 【2021/07/28】 Upstream fixed the fatal error of [memory leak](https://github.com/Megvii-BaseDetection/YOLOX/issues/103).
+**Original YOLOX** (history of the original project, summarized from its README)
+* 【2023/02/28】 The original project added an assignment visualization tool, see doc [here](./docs/assignment_visualization.md).
+* 【2022/04/14】 The original project added JIT-compiled ops.
+* 【2021/08/19】 The original project optimized the training process: **2x** faster training and **~1%** higher performance. See [notes](docs/updates_note.md) for more details.
+* 【2021/08/05】 The original project released the [MegEngine version YOLOX](https://github.com/MegEngine/YOLOX).
+* 【2021/07/28】 The original project fixed the fatal error of [memory leak](https://github.com/Megvii-BaseDetection/YOLOX/issues/103).
 * 【2021/07/20】 The YOLOX authors released their technical report on [Arxiv](https://arxiv.org/abs/2107.08430).
 
 ## Benchmark
@@ -95,7 +95,7 @@ Requirements: Linux, Python ≥ 3.10, PyTorch ≥ 2.0 with a matching torchvisio
 
 Step1. Install PyTorch for your CUDA version, following [pytorch.org](https://pytorch.org/get-started/locally/).
 
-Step2. Install YOLOX from source (clone this repository; upstream is [here](https://github.com/Megvii-BaseDetection/YOLOX)).
+Step2. Install YOLOX from source (clone this repository; the original YOLOX is [here](https://github.com/Megvii-BaseDetection/YOLOX)).
 ```shell
 cd YOLOX
 pip3 install -v -e .
@@ -106,7 +106,7 @@ pip3 install -v -e ".[export]"   # onnx, onnxsim, onnxruntime
 pip3 install -v -e ".[trt]"      # tensorrt>=10,<11 (on Jetson use the TensorRT from JetPack instead)
 pip3 install -v -e ".[test]"     # pytest
 ```
-Do not install this fork next to upstream's `yolox` package: both use the import name `yolox`.
+Do not install this next to the original `yolox` package: both use the import name `yolox`.
 
 Checkpoints are loaded with `torch.load(..., weights_only=True)`. If an old checkpoint is refused (for example one containing numpy scalars on torch < 2.4), set `YOLOX_TRUST_CKPT=1` for that command, and only for files you trust.
 
@@ -135,7 +135,7 @@ python tools/demo.py video -n yolox-s -c /path/to/your/yolox_s.pth --path /path/
 </details>
 
 <details>
-<summary>Reproduce the upstream results on COCO</summary>
+<summary>Reproduce the original YOLOX results on COCO</summary>
 
 Step1. Prepare COCO dataset
 ```shell
@@ -143,7 +143,7 @@ cd <YOLOX_HOME>
 ln -s /path/to/your/COCO ./datasets/COCO
 ```
 
-Step2. Reproduce the upstream results on COCO by specifying -n:
+Step2. Reproduce the original YOLOX results on COCO by specifying -n:
 
 ```shell
 python -m yolox.tools.train -n yolox-s -d 8 -b 64 --fp16 -o [--cache]
@@ -221,7 +221,7 @@ python -m yolox.tools.eval -n  yolox-s -c yolox_s.pth -b 64 -d 8 --conf 0.001 [-
 * -d: number of GPUs used for evaluation. DEFAULT: All GPUs available will be used.
 * -b: total batch size across on all GPUs
 
-The upstream speed test uses the following command:
+The original YOLOX speed test uses the following command:
 ```shell
 python -m yolox.tools.eval -n  yolox-s -c yolox_s.pth -b 1 -d 1 --conf 0.001 --fp16 --fuse
                                yolox-m
@@ -267,7 +267,7 @@ python tools/demo.py image -n yolox-s --trt --path assets/dog.jpg --save_result
 * Converting darknet or yolov5 datasets to COCO format for YOLOX: [YOLO2COCO](https://github.com/RapidAI/YOLO2COCO) from [Daniel](https://github.com/znsoftm)
 
 ## Cite YOLOX
-The model, paper and benchmarks belong to the original authors ([upstream repo](https://github.com/Megvii-BaseDetection/YOLOX)). If you use YOLOX in your research, please cite their work by using the following BibTeX entry:
+The model, paper and benchmarks belong to the original authors ([original repo](https://github.com/Megvii-BaseDetection/YOLOX)). If you use YOLOX in your research, please cite their work by using the following BibTeX entry:
 
 ```latex
  @article{yolox2021,
@@ -278,7 +278,7 @@ The model, paper and benchmarks belong to the original authors ([upstream repo](
 }
 ```
 ## In memory of Dr. Jian Sun
-This section is carried over from the upstream README. It is the original YOLOX authors' dedication, not a statement of this fork:
+This section is carried over from the original YOLOX README. It is the original YOLOX authors' dedication, not a statement of this project:
 
 > Without the guidance of [Dr. Jian Sun](https://scholar.google.com/citations?user=ALVSZAYAAAAJ), YOLOX would not have been released and open sourced to the community.
 > The passing away of Dr. Sun is a huge loss to the Computer Vision field. We add this section here to express our remembrance and condolences to our captain Dr. Sun.

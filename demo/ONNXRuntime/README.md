@@ -11,7 +11,7 @@ pip install -e ".[export]"
 
 ### Step2: Get ONNX models
 
-Users might download the pre-generated ONNX models published by the upstream YOLOX project (not re-generated or re-tested in this fork) or convert their own models to ONNX.
+Users might download the pre-generated ONNX models published by the original YOLOX project (not re-generated or re-tested in this project) or convert their own models to ONNX.
 
 #### Download ONNX models.
 

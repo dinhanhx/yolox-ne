@@ -7,7 +7,7 @@ Requirements: Linux, Python >= 3.10, PyTorch >= 2.0 (with matching torchvision),
 
 Step1. Install PyTorch for your CUDA version, following [pytorch.org](https://pytorch.org/get-started/locally/).
 
-Step2. Install YOLOX from a clone of this repository (upstream: [https://github.com/Megvii-BaseDetection/YOLOX](https://github.com/Megvii-BaseDetection/YOLOX)). `pycocotools` is installed as a dependency.
+Step2. Install YOLOX from a clone of this repository (original YOLOX: [https://github.com/Megvii-BaseDetection/YOLOX](https://github.com/Megvii-BaseDetection/YOLOX)). `pycocotools` is installed as a dependency.
 ```shell
 cd YOLOX
 pip3 install -U pip
@@ -36,7 +36,7 @@ python tools/demo.py video -n yolox-s -c /path/to/your/yolox_s.pth --path /path/
 ```
 
 
-## 3.Reproduce the upstream results on COCO
+## 3.Reproduce the original YOLOX results on COCO
 
 Step1. Prepare COCO dataset
 ```shell
@@ -44,7 +44,7 @@ cd <YOLOX_HOME>
 ln -s /path/to/your/COCO ./datasets/COCO
 ```
 
-Step2. Reproduce the upstream results on COCO by specifying -n:
+Step2. Reproduce the original YOLOX results on COCO by specifying -n:
 
 ```shell
 python tools/train.py -n yolox-s -d 8 -b 64 --fp16 -o [--cache]
@@ -119,7 +119,7 @@ python tools/eval.py -n  yolox-s -c yolox_s.pth -b 64 -d 8 --conf 0.001 [--fp16]
 * -d: number of GPUs used for evaluation. DEFAULT: All GPUs available will be used.
 * -b: total batch size across on all GPUs
 
-The upstream speed test uses the following command:
+The original YOLOX speed test uses the following command:
 ```shell
 python tools/eval.py -n  yolox-s -c yolox_s.pth -b 1 -d 1 --conf 0.001 --fp16 --fuse
                          yolox-m

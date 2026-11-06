@@ -3,7 +3,7 @@
 
 ## 【2026/11/05】
 
-Migration of this fork (`yolox-ne`) from upstream [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX):
+Migration of `yolox-ne` from the original [YOLOX](https://github.com/Megvii-BaseDetection/YOLOX):
 
 * Python >= 3.10, PyTorch >= 2.0, Linux only; `pyproject.toml` packaging that does not import torch at build time.
 * Removed Windows support, the MegEngine / ncnn / OpenVINO / nebullvm demos, TorchScript export, VOC support and `torch2trt`.
@@ -22,7 +22,7 @@ Details and verification status: [SPEC.md](../SPEC.md).
 
 ### 2X Faster training
 
-Upstream optimized the data preprocess and added image caching with the `--cache` flag:
+The original project optimized the data preprocess and added image caching with the `--cache` flag:
 
 ```shell
 python tools/train.py -n yolox-s -d 8 -b 64 --fp16 -o [--cache]
@@ -41,11 +41,11 @@ New models achieve **~1%** higher performance! See [Model_Zoo](model_zoo.md) for
 
 ### Support torch amp
 
-Upstream added torch.cuda.amp training and dropped Apex.
+The original project added torch.cuda.amp training and dropped Apex.
 
 ### Breaking changes
 
-Upstream removed the normalization operation like -mean/std. This will make the old weights **incompatible**.
+The original project removed the normalization operation like -mean/std. This will make the old weights **incompatible**.
 
 If you still want to use old weights, you can add `--legacy' in demo and eval:
 
@@ -62,6 +62,6 @@ python tools/eval.py -n  yolox-s -c yolox_s.pth -b 64 -d 8 --conf 0.001 [--fp16]
                          yolox-x
 ```
 
-But for the deployment demos, upstream no longer supports the old weights. Users could checkout to YOLOX version 0.1.0 to use legacy weights for deployment
+But for the deployment demos, the original project no longer supports the old weights. Users could checkout to YOLOX version 0.1.0 to use legacy weights for deployment
 
 

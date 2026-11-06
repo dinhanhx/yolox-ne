@@ -1,6 +1,6 @@
 # Model Zoo
 
-Benchmarks and weights are published by the upstream project ([https://github.com/Megvii-BaseDetection/YOLOX](https://github.com/Megvii-BaseDetection/YOLOX)); they were not re-measured in this fork.
+Benchmarks and weights are published by the original YOLOX project ([https://github.com/Megvii-BaseDetection/YOLOX](https://github.com/Megvii-BaseDetection/YOLOX)); they were not re-measured in this project.
 
 ## Standard Models.
 
