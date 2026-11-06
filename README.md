@@ -247,7 +247,7 @@ python -m yolox.tools.eval -n  yolox-s -c yolox_s.pth -b 1 -d 1 --conf 0.001 --f
 
 
 1. [ONNX export and an ONNXRuntime](./demo/ONNXRuntime)
-2. [TensorRT (Python)](./demo/TensorRT/python): build an engine from ONNX with `tools/trt.py`. The [C++ demo](./demo/TensorRT/cpp) is still written for TensorRT 7 and has not been ported.
+2. [TensorRT (Python)](./demo/TensorRT/python): build an engine from ONNX with `tools/trt.py`.
 
 ```shell
 python tools/export_onnx.py -n yolox-s -c yolox_s.pth --output-name yolox_s.onnx      # add --dynamic for dynamic batch

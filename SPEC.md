@@ -66,7 +66,7 @@ Labels: **[Verified]** = run in this session; **[Unverified]** = not run; **[Inf
 ## 7. Removed scope
 
 `demo/MegEngine`, `demo/ncnn`, `demo/OpenVINO`, `demo/nebullvm`, `tools/export_torchscript.py`, VOC dataset/evaluator/exps, `torch2trt`, Windows branches.
-Kept: `demo/ONNXRuntime`, `demo/TensorRT`. The C++ TensorRT demo is still TRT 7 code and does not build against TRT 10 (not ported). [Inference from reading the source; not compiled]
+Kept: `demo/ONNXRuntime`, `demo/TensorRT/python`. The C++ TensorRT demo (`demo/TensorRT/cpp`, TRT 7 code that did not build against TRT 10) was removed.
 
 ## 8. Quality gates
 
